@@ -1,0 +1,40 @@
+& control
+start_time = '2018-07-01 00:00:00',
+all_time = 864000,
+output_interval = 86400, 	
+nx = 20,			
+ny = 16,			
+d = 300000,		
+dt = 600			
+clat =  45,		
+clon = 120,		
+input_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Input\',		
+output_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Output\',	
+/
+
+& integration
+time_integration_type = 1,		
+space_integration_type = 1,	
+/
+
+& initial_boundary
+initial = 1,		
+boundary = 1, 		
+/
+
+& smooth
+S_time = 0.5,		
+S_space = 0.5,		
+/
+
+& post_processing
+ctl_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Postprocess\', 
+/
+
+& pre_processing
+data_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\data\uwnd.2018.nc', 'C:\Users\NH4NO3nice\Desktop\PE_module\data\vwnd.2018.nc', 'C:\Users\NH4NO3nice\Desktop\PE_module\data\hgt.2018.nc',
+data_name = 'uwnd', 'vwnd', 'hgt',
+data_lon_name = 'lon',
+data_lat_name = 'lat',				
+data_file_type = 1,
+/

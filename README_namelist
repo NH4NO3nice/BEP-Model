@@ -1,0 +1,40 @@
+& control
+start_time = '2018-01-01'	! 初始时间
+all_time = 86400,		! 总积分时长/秒
+output_interval = 43200, 	! 数据输出时间间隔
+nx = 20,			! 纬向格点数
+ny = 16,			! 经向格点数
+d = 300000,		! 网格距/米
+dt = 600			! 时间积分步长/秒
+clat =  45,		! 区域中心纬度
+clon = 120,		! 区域中心经度
+input_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Input\',		! 输入数据地址
+output_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Output\',	! 输出数据地址
+/
+
+& integration
+time_integration_type = 1,	! 时间差分格式选择
+space_integration_type = 1,	! 空间差分格式选择
+/
+
+& initial_boundary
+initial = 1,		! 初始条件类型
+boundary = 1, 		! 边界条件类型
+/
+
+& smooth
+S_time = 0.5,		! 时间平滑系数
+S_space = 0.5,		! 空间平滑系数
+/
+
+& post_processing
+ctl_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Postprocess\', 	! ctl存放地址
+/
+
+& pre_processing				! 前处理：提取数据
+data_path = , , ,				! 数据存放地址，三个地址，分别为u,v,z（一定按顺序填写）,若三个物理量在同一个文件中，则将该文件写三次
+data_name = , , ,				! 各文件中物理量名称u,v,z
+data_lon_name = ,				! 文件中经度的名称
+data_lat_name = ,				! 文件中纬度的名称
+data_file_type = 1,				! 数据格式/nc/grib2
+/
