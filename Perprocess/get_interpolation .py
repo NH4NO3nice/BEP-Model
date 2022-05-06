@@ -64,7 +64,7 @@ namelist = f90nml.read(namelist_file)
 data_path = namelist['pre_processing']['data_path']
 data_name = namelist['pre_processing']['data_name']
 start_time = namelist['control']['start_time']
-temp = ['u', 'v', 'z']
+temp = ['ua', 'va', 'za']
 for i in range(3):
     data = xr.open_dataset(data_path[i])
     xlon, ylat = data['lon'], data['lat']  # 提取物理量经纬度
