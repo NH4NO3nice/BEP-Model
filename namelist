@@ -1,15 +1,16 @@
 & control
-start_time = '2018-07-01 00:00:00',
-all_time = 864000,
-output_interval = 86400, 	
+start_time = '1973-04-29 08:00:00',
+all_time = 86400,
+output_interval = 43200, 	
 nx = 20,			
 ny = 16,			
 d = 300000,		
-dt = 600			
+dt = 600,			
 clat =  45,		
 clon = 120,		
 input_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Input\',		
-output_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Output\',	
+output_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Output\',
+output_filename = 'uvz_geo_backward.grd',	
 /
 
 & integration
@@ -18,11 +19,12 @@ space_integration_type = 1,
 /
 
 & initial_boundary
-initial = 1,		
+initial = 3,		
 boundary = 1, 		
 /
 
 & smooth
+Plus_minus_smooth = 1,
 S_time = 0.5,		
 S_space = 0.5,		
 /

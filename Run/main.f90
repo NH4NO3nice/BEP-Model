@@ -18,6 +18,8 @@ PROGRAM main
 ! 时空平滑系数S_time, S_space
 ! 输出数据时间间隔output_interval/秒 
 ! 存放初始时间start_time
+! 是否做正逆平滑 Plus_minus_smooth
+! 定义初始数据文件地址，文件地址及预报结果文件名 input_path, output_path, output_filename
 
 USE module_initialization                   !  声明初始化模块
 USE module_boundary                        !  声明边界条件模块
@@ -31,6 +33,7 @@ USE module_time_smooth                   !  声明时间平滑模块
     INTEGER :: nx, ny  !  定义区域网格点
     INTEGER :: i, j, p, q  !  循环变量
     INTEGER :: initial, boundary, time_integration_type, space_integration_type
+    INTEGER :: Plus_minus_smooth  ! 是否做正逆平滑
     INTEGER :: all_time, dt  !  定义总积分时长, 积分步长
     INTEGER :: output_interval  !  输出数据时间间隔/秒
     INTEGER :: int, remainder  !  all_time与12h相除的除数和余数
@@ -41,7 +44,7 @@ USE module_time_smooth                   !  声明时间平滑模块
     REAL, ALLOCATABLE :: za(:, :), ua(:, :), va(:, :), &
                                                zb(:, :), ub(:, :), vb(:, :), &
                                                zc(:, :), uc(:, :), vc(:, :)  !  定义n-1，n，n+1时间层的位势高度场、u风场、v风场
-    CHARACTER(50) :: input_path, output_path  !  定义初始数据文件地址，输出文件地址
+    CHARACTER(50) :: input_path, output_path, output_filename  !  定义初始数据文件地址，文件地址及预报结果文件名
     CHARACTER :: start_time  !  存放初始时间
     
     write(*, '(100A)'), '################################################################'
@@ -52,10 +55,10 @@ USE module_time_smooth                   !  声明时间平滑模块
     write(*, '(100A)'), '     Shanchuan Xiao    '
     write(*, '(100A)'), '################################################################'
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 从namelist文件中读取控制变量!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    namelist / control / start_time, all_time, output_interval, nx, ny, d, dt, clon, clat, input_path, output_path
+    namelist / control / start_time, all_time, output_interval, nx, ny, d, dt, clon, clat, input_path, output_path, output_filename
     namelist / initial_boundary / initial, boundary
     namelist / integration / time_integration_type, space_integration_type
-    namelist / smooth / S_time, S_space
+    namelist / smooth / Plus_minus_smooth, S_time, S_space
     
     open(11, file = 'C:\Users\NH4NO3nice\Desktop\PE_module\namelist')
     read(11, nml = control)
@@ -93,26 +96,38 @@ USE module_time_smooth                   !  声明时间平滑模块
         read(13), ((ua(i, j), i = 1, nx), j = 1, ny)
         read(14), ((va(i, j), i = 1, nx), j = 1, ny)
         close(13);close(14)
-        !!!!!!!!!!!!!!!!!!!!!!!将u、v初值存入grd中，与最后的预测值放在同一个文件中，方便绘图!!!!!!!!!!!!!!!!!!!!!!!
-        open(19, file = trim(output_path) // 'uvz.grd', form = 'binary')
-        write(19), ((ua(i, j), i= 1, nx), j = 1, ny)
-        write(19), ((va(i, j), i= 1, nx), j = 1, ny)
-        write(19), ((za(i, j), i= 1, nx), j = 1, ny)
-    else if (initial == 1) then !  地转风初始化
-        call geostrophic_wind(ua, va, za, m, f, nx, ny, d)
         
+    else if (initial == 1) then !  中央差地转风初始化
+        call geostrophic_wind_centre(ua, va, za, m, f, nx, ny, d)
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!输出地转风!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         open(17, file = trim(output_path) // 'geo_u.txt')
         open(18, file = trim(output_path) // 'geo_v.txt')
         write(17, '(20f10.5)'), ua
         write(18, '(20f10.5)'), va
         close(17); close(18)
-        !!!!!!!!!!!!!!!!!!!!!!!将u、v，z初值存入grd中，与最后的预测值放在同一个文件中，方便绘图!!!!!!!!!!!!!!!!!!!!!!!
-        open(19, file = trim(output_path) // 'uvz.grd', form = 'binary')
-        write(19), ((ua(i, j), i= 1, nx), j = 1, ny)
-        write(19), ((va(i, j), i= 1, nx), j = 1, ny)
-        write(19), ((za(i, j), i= 1, nx), j = 1, ny)
+    else if (initial == 2) then !  前差地转风初始化
+        call geostrophic_wind_forward(ua, va, za, m, f, nx, ny, d)
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!输出地转风!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        open(17, file = trim(output_path) // 'geo_u.txt')
+        open(18, file = trim(output_path) // 'geo_v.txt')
+        write(17, '(20f10.5)'), ua
+        write(18, '(20f10.5)'), va
+        close(17); close(18)
+    else if (initial == 3) then !  后差地转风初始化
+        call geostrophic_wind_backward(ua, va, za, m, f, nx, ny, d)
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!输出地转风!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        open(17, file = trim(output_path) // 'geo_u.txt')
+        open(18, file = trim(output_path) // 'geo_v.txt')
+        write(17, '(20f10.5)'), ua
+        write(18, '(20f10.5)'), va
+        close(17); close(18)
     endif
+    
+    !!!!!!!!!!!!!!!!!!!!!!!将u、v，z初值存入grd中，与最后的预测值放在同一个文件中，方便绘图!!!!!!!!!!!!!!!!!!!!!!!
+    open(19, file = trim(output_path) // trim(output_filename), form = 'binary')
+    write(19), ((ua(i, j), i= 1, nx), j = 1, ny)
+    write(19), ((va(i, j), i= 1, nx), j = 1, ny)
+    write(19), ((za(i, j), i= 1, nx), j = 1, ny)
     
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!数值计算!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -122,7 +137,12 @@ USE module_time_smooth                   !  声明时间平滑模块
     !ub = 0; vb = 0; zb = 0
     !uc = 0; vc = 0; zc = 0
     call transmit(ub, vb, zb, ua, va, za, nx, ny)   !  将初始值传递给当前时刻物理量
-    call fixed_boundary(ub, vb, zb, uc, vc, zc, nx, ny)  !  添加边界条件
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!添加边界条件!!!!!!!!!!!!!!!!!!!!!!!!1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (boundary == 1) then   ! 固定边界
+        call fixed_boundary(ub, vb, zb, uc, vc, zc, nx, ny)  
+    endif
+    
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!时间差分!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if (time_integration_type == 1) then  !  欧拉-后差 + “三步法”起步中央差
         int = all_time / (12 * 3600); remainder = mod(all_time, (12 * 3600))
@@ -135,6 +155,7 @@ USE module_time_smooth                   !  声明时间平滑模块
             do j = 1, 3600 / dt  !  前1h用欧拉-后差格式
                 call Euler_post(ub, vb, zb, uc, vc, zc, m, f, d, dt, nx, ny, space_integration_type)  ! 时间差分
                 call transmit(ub, vb, zb, uc, vc, zc, nx, ny)  !  将uc, vc, zc的值传递给ub, vb, zb，方便下一步的时间积分
+                
                 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!判断是否积分终止!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 if (i == int .and. j == remainder) then
                     print*,j,'stop'
@@ -157,6 +178,16 @@ USE module_time_smooth                   !  声明时间平滑模块
             call nine_smooth_space_out(ub, nx, ny, S_space)
             call nine_smooth_space_out(vb, nx, ny, S_space)
             call nine_smooth_space_out(zb, nx, ny, S_space)
+            
+            if (Plus_minus_smooth == 0) then  ! 不做正逆平滑，只做正平滑
+                continue  ! 程序继续向下执行；相当于python中的pass
+                
+            else if (Plus_minus_smooth == 1) then  ! 做正逆平滑
+                call nine_smooth_space_out(ub, nx, ny, -1 * S_space)  ! 逆平滑
+                call nine_smooth_space_out(vb, nx, ny, -1 * S_space)
+                call nine_smooth_space_out(zb, nx, ny, -1 * S_space)
+            endif
+                
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!“三步法”起报!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             call three_step_start(ua, va, za, ub, vb, zb, uc, vc, zc, m, f, d, dt, nx, ny, space_integration_type)  !  “三步法”起步中央差，向前报2步
             call transmit(ub, vb, zb, uc, vc, zc, nx, ny)  !  将uc, vc, zc的值传递给ub, vb, zb，方便下一步的时间积分
@@ -180,20 +211,34 @@ USE module_time_smooth                   !  声明时间平滑模块
                     call five_smooth_space_in(vb, nx, ny, S_space)
                     call five_smooth_space_in(zb, nx, ny, S_space)  !  只平滑了当前时间层，n-1时间层并未平滑！！
                     
-                    call five_smooth_space_in(ub, nx, ny, -1 * S_space)
-                    call five_smooth_space_in(vb, nx, ny, -1 * S_space)
-                    call five_smooth_space_in(zb, nx, ny, -1 * S_space)  ! 逆平滑
+                    if (Plus_minus_smooth == 0) then  ! 不做正逆平滑，只做正平滑
+                        continue  ! 程序继续向下执行；相当于python中的pass
+                        
+                    else if (Plus_minus_smooth == 1) then
+                        call five_smooth_space_in(ub, nx, ny, -1 * s_space)
+                        call five_smooth_space_in(vb, nx, ny, -1 * s_space)
+                        call five_smooth_space_in(zb, nx, ny, -1 * s_space)  ! 逆平滑
+                    endif
                 else 
                     if (mod(j * dt, 3600) == 0) then  !  每1h边界平滑一次
                         call nine_smooth_space_out(ub, nx, ny, S_space)
                         call nine_smooth_space_out(vb, nx, ny, S_space)
                         call nine_smooth_space_out(zb, nx, ny, S_space)
+                        
+                        if (Plus_minus_smooth == 0) then  ! 不做正逆平滑，只做正平滑
+                            continue  ! 程序继续向下执行；相当于python中的pass
+                            
+                        else if (Plus_minus_smooth == 1) then  ! 做正逆平滑
+                            call nine_smooth_space_out(ub, nx, ny, -1 * S_space)  ! 逆平滑
+                            call nine_smooth_space_out(vb, nx, ny, -1 * S_space)
+                            call nine_smooth_space_out(zb, nx, ny, -1 * S_space)
+                        endif
                     endif
                 endif
                 
                  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!判断是否积分终止!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 if (i == int .and. j == remainder) then
-                    print*,j,'stop'
+                    print*, j, 'stop'
                     write(19), ((ub(p, q), p= 1, nx), q = 1, ny)
                     write(19), ((vb(p, q), p= 1, nx), q = 1, ny)
                     write(19), ((zb(p, q), p= 1, nx), q = 1, ny)

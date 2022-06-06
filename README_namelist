@@ -10,21 +10,23 @@ clat =  45,		! 区域中心纬度
 clon = 120,		! 区域中心经度
 input_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Input\',		! 输入数据地址
 output_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Output\',	! 输出数据地址
+output_filename = 'uvz.grd',	! 预报结果文件名，仅指出grd文件输出
 /
 
 & integration
-time_integration_type = 1,	! 时间差分格式选择
-space_integration_type = 1,	! 空间差分格式选择
+time_integration_type = 1,	! 时间差分格式选择；1：欧拉-后差 + “三步法”起步的中央差(12h一次循环)
+space_integration_type = 1,	! 空间差分格式选择；1：通量形式的二次守恒格式
 /
 
 & initial_boundary
-initial = 1,		! 初始条件类型
-boundary = 1, 		! 边界条件类型
+initial = 1,		! 初始条件类型；0：原始初值；1：中央差地转风平衡；2：前差地转风平衡；3：后差地转风平衡
+boundary = 1, 		! 边界条件类型；1：固定边界
 /
 
 & smooth
-S_time = 0.5,		! 时间平滑系数
-S_space = 0.5,		! 空间平滑系数
+Plus_minus_smooth = 1,	! 是否做正逆平滑，对时空平滑均有效；0：正平滑，1：正逆平滑
+S_time = 0.5,		! 时间平滑系数，若设置为0，即为不做时间平滑
+S_space = 0.5,		! 空间平滑系数，若设置为0，即为不做空间平滑
 /
 
 & post_processing

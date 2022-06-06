@@ -1,10 +1,10 @@
-DSET C:\Users\NH4NO3nice\Desktop\PE_module\Output\uvz.grd
+DSET C:\Users\NH4NO3nice\Desktop\PE_module\Output\uvz_+smooth.grd
 TITLE 500hPa wind and height field
 UNDEF -9999.0
 XDEF 20 LINEAR 85.0 4.0
 YDEF 16 LINEAR 25.0 2.5
 ZDEF 1 LINEAR 1 1
-TDEF 11 LINEAR 00Z01Aug2018 24hr
+TDEF 2 LINEAR 00Z01Aug2018 24hr
 VARS 3
 U 0 99 500
 V 0 99 500
