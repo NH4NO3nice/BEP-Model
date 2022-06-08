@@ -8,8 +8,8 @@ d = 300000,
 dt = 600,			
 clat =  45,		
 clon = 120,		
-input_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Input\',		
-output_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Output\',
+input_path = './Input/',		
+output_path = './Output/',
 output_filename = 'uvz_geo_backward.grd',	
 /
 
@@ -30,11 +30,11 @@ S_space = 0.5,
 /
 
 & post_processing
-ctl_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\Postprocess\', 
+ctl_path = './Postprocess/', 
 /
 
 & pre_processing
-data_path = 'C:\Users\NH4NO3nice\Desktop\PE_module\data\uwnd.2018.nc', 'C:\Users\NH4NO3nice\Desktop\PE_module\data\vwnd.2018.nc', 'C:\Users\NH4NO3nice\Desktop\PE_module\data\hgt.2018.nc',
+data_path = './data/uwnd.2018.nc', './data/vwnd.2018.nc', './data/hgt.2018.nc',
 data_name = 'uwnd', 'vwnd', 'hgt',
 data_lon_name = 'lon',
 data_lat_name = 'lat',				
