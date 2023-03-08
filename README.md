@@ -5,7 +5,7 @@
 ​在地图投影坐标下的正压原始方程模式预报方程组，如下，  
 
 $$
-\frac{\partial u}{\partial t} = -m\left(u \frac{\partial u}{\partial x}+v \frac{\partial u}{\partial y}\right)+f^{*} v-m g \frac{\partial z}{\partial x}
+\frac{\partial u}{\partial t} = -m(u \frac{\partial u}{\partial x}+v \frac{\partial u}{\partial y})+f^{*} v-m g \frac{\partial z}{\partial x}
 $$
 $$
 \frac{\partial v}{\partial t} = -m\left(u \frac{\partial v}{\partial x}+v \frac{\partial v}{\partial y}\right)-f^{*} u-m g \frac{\partial z}{\partial y}
@@ -91,7 +91,7 @@ $$
 
 + 在时间积分过程中，为阻尼高频振荡，抑制计算解的增长，可穿插进行时间平滑（3点平滑）：
 $$
-\widetilde{F_{i, j}^{n}}^{t}=(1-S) F_{i, j}^{n}+\frac{S}{2}\left(F_{i, j}^{n+1}+F_{i, j}^{n-1}\right)
+\widetilde{F_{i, j}^{n}}=(1-S) F_{i, j}^{n}+\frac{S}{2}\left(F_{i, j}^{n+1}+F_{i, j}^{n-1}\right)
 $$
 + 为滤除短波扰动，抑制非线性计算不稳定，可穿插进行空间平滑：  
 
